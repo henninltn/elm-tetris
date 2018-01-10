@@ -4,8 +4,6 @@ module Model.Field
         , Model
         , Field
         , init
-        , initCurrentTetriminoLocation
-        , initNextTetriminoLocation
         , isValidLocation
         , fixTetrimino
         )
@@ -26,25 +24,17 @@ type alias Model =
     { field : Field
     , tetrimino : Maybe Tetrimino
     , nextTetriminoQueue : List Tetrimino
+    , isGameOver : Bool
     }
 
 
 init : Model
 init =
-    { field = Matrix.matrix 24 10 (\_ -> Invisible)
+    { field = Matrix.matrix 21 10 (\_ -> Invisible)
     , tetrimino = Nothing
     , nextTetriminoQueue = []
+    , isGameOver = False
     }
-
-
-initCurrentTetriminoLocation : Location
-initCurrentTetriminoLocation =
-    ( 3, 4 )
-
-
-initNextTetriminoLocation : Location
-initNextTetriminoLocation =
-    ( 6, 4 )
 
 
 type alias Field =

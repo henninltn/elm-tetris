@@ -14,8 +14,8 @@ view : Model -> Html Msg
 view model =
     div []
         [ Svg.svg
-            [ HA.width 300
-            , HA.height 500
+            [ HA.width 200
+            , HA.height 420
             , HA.style
                 [ ( "background-color", "black" )
                 ]
@@ -23,8 +23,9 @@ view model =
             [ model.field
                 |> fieldSvg
             , model.tetrimino
-                |> Maybe.map (\t -> tetriminoSvg t)
-                |> Maybe.withDefault (g [] [])
+                |> tetriminoSvg
+            , model.isGameOver
+                |> gameOverSvg
             ]
         ]
 
@@ -56,8 +57,17 @@ blockSvg location color =
         []
 
 
-tetriminoSvg : Tetrimino -> Svg Msg
-tetriminoSvg tetrimino =
+tetriminoSvg : Maybe Tetrimino -> Svg Msg
+tetriminoSvg maybeTetrimino =
+    maybeTetrimino
+        |> Maybe.map
+            (\t -> justTetriminoSvg t)
+        |> Maybe.withDefault
+            (g [] [])
+
+
+justTetriminoSvg : Tetrimino -> Svg Msg
+justTetriminoSvg tetrimino =
     let
         posX =
             tetrimino.location |> getX
@@ -93,3 +103,29 @@ fieldSvg field =
                 (\l c -> blockSvg l c)
             |> Matrix.flatten
         )
+
+
+gameOverSvg : Bool -> Svg Msg
+gameOverSvg isGameOver =
+    if isGameOver then
+        g []
+            [ rect
+                [ SA.x "10"
+                , SA.y "160"
+                , SA.width "180"
+                , SA.height "80"
+                , SA.fill "Black"
+                , SA.stroke "White"
+                ]
+                []
+            , text_
+                [ SA.x "100"
+                , SA.y "210"
+                , SA.fill "DeepPink"
+                , SA.fontSize "30"
+                , SA.textAnchor "middle"
+                ]
+                [ Svg.text "Game Over" ]
+            ]
+    else
+        g [] []

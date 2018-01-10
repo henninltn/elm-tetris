@@ -1,6 +1,17 @@
-module Model.Location exposing (add, rotateRight, rotateLeft, reverse)
+module Model.Location
+    exposing
+        ( reverse
+        , add
+        , rotateRight
+        , rotateLeft
+        )
 
 import Matrix exposing (Location, loc, row, col)
+
+
+reverse : Location -> Location
+reverse l =
+    ( -(row l), -(col l) )
 
 
 add : Location -> Location -> Location
@@ -16,8 +27,3 @@ rotateRight l =
 rotateLeft : Location -> Location
 rotateLeft l =
     ( col l, -(row l) )
-
-
-reverse : Location -> Location
-reverse l =
-    ( -(row l), -(col l) )

@@ -1,4 +1,7 @@
-module Model.Color exposing (Color(..))
+module Model.Color
+    exposing
+        ( Color(..)
+        )
 
 
 type Color

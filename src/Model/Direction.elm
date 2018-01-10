@@ -1,43 +1,49 @@
-module Model.Direction exposing (Direction(..), rotateRight, rotateLeft, reverse)
+module Model.Direction
+    exposing
+        ( Direction(..)
+        , rotateRight
+        , rotateLeft
+        , reverse
+        )
 
 
 type Direction
-    = Top
+    = Up
     | Right
-    | Bottom
+    | Down
     | Left
 
 
 rotateRight : Direction -> Direction
 rotateRight direction =
     case direction of
-        Top ->
+        Up ->
             Right
 
         Right ->
-            Bottom
+            Down
 
-        Bottom ->
+        Down ->
             Left
 
         Left ->
-            Top
+            Up
 
 
 rotateLeft : Direction -> Direction
 rotateLeft direction =
     case direction of
-        Top ->
+        Up ->
             Left
 
         Right ->
-            Top
+            Up
 
-        Bottom ->
+        Down ->
             Right
 
         Left ->
-            Bottom
+            Down
 
 
 reverse : Direction -> Direction

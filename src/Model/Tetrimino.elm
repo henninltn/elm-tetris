@@ -3,16 +3,23 @@ module Model.Tetrimino
         ( Tetrimino
         , Kind(..)
         , intToKind
-        , toLocationColorPairList
         , moveRight
-        , moveBottom
+        , moveDown
         , moveLeft
+        , toLocationColorPairList
         )
 
 import Matrix exposing (Location, loc)
 import Model.Color exposing (Color(..))
 import Model.Direction exposing (Direction(..))
 import Model.Location as Location
+
+
+type alias Tetrimino =
+    { kind : Kind
+    , location : Location
+    , direction : Direction
+    }
 
 
 type Kind
@@ -23,13 +30,6 @@ type Kind
     | J
     | L
     | T
-
-
-type alias Tetrimino =
-    { kind : Kind
-    , location : Location
-    , direction : Direction
-    }
 
 
 intToKind : Int -> Maybe Kind
@@ -60,8 +60,8 @@ moveRight { kind, location, direction } =
     }
 
 
-moveBottom : Tetrimino -> Tetrimino
-moveBottom { kind, location, direction } =
+moveDown : Tetrimino -> Tetrimino
+moveDown { kind, location, direction } =
     { kind = kind
     , location = Location.add location (loc 1 0)
     , direction = direction
@@ -91,14 +91,14 @@ setRotate kind direction locColorList =
 
         _ ->
             case direction of
-                Top ->
+                Up ->
                     locColorList
 
                 Right ->
                     (\( l, c ) -> ( Location.rotateRight l, c )) <|
                         locColorList
 
-                Bottom ->
+                Down ->
                     (\( l, c ) -> ( Location.reverse l, c )) <|
                         locColorList
 
@@ -141,62 +141,62 @@ initLocationList kind =
 
 i : List Location
 i =
-    [ loc 0 2
+    [ loc -1 2
+    , loc -1 1
+    , loc -1 0
+    , loc -1 -1
+    ]
+
+
+o : List Location
+o =
+    [ loc -1 0
+    , loc -1 -1
+    , loc 0 0
+    , loc 0 -1
+    ]
+
+
+s : List Location
+s =
+    [ loc -1 0
+    , loc -1 -1
+    , loc 0 1
+    , loc 0 0
+    ]
+
+
+z : List Location
+z =
+    [ loc -1 1
+    , loc -1 0
+    , loc 0 0
+    , loc 0 -1
+    ]
+
+
+j : List Location
+j =
+    [ loc -1 1
     , loc 0 1
     , loc 0 0
     , loc 0 -1
     ]
 
 
-o : List Location
-o =
-    [ loc 0 0
-    , loc 0 -1
-    , loc 1 0
-    , loc 1 -1
-    ]
-
-
-s : List Location
-s =
-    [ loc 0 0
-    , loc 0 -1
-    , loc 1 1
-    , loc 1 0
-    ]
-
-
-z : List Location
-z =
-    [ loc 0 1
-    , loc 0 0
-    , loc 1 0
-    , loc 1 -1
-    ]
-
-
-j : List Location
-j =
-    [ loc 0 1
-    , loc 1 1
-    , loc 1 0
-    , loc 1 -1
-    ]
-
-
 l : List Location
 l =
-    [ loc 0 -1
-    , loc 1 1
-    , loc 1 0
-    , loc 1 -1
+    [ loc -1 -1
+    , loc 0 1
+    , loc 0 0
+    , loc 0 -1
     ]
 
 
 t : List Location
 t =
-    [ loc 0 0
-    , loc 1 1
-    , loc 1 0
-    , loc 1 -1
+    [ loc -1 0
+    , loc 0 1
+    , loc 0 0
+    , loc 0 -1
     ]
