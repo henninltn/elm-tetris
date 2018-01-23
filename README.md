@@ -21,3 +21,12 @@ elm package install -y
 ```
 elm reactor
 ```
+
+or
+
+```
+elm make src/Main.elm --output=main.html
+```
+
+and browse the file /path/to/elm-tetris/main.html.
+
