@@ -53,27 +53,18 @@ intToKind i =
 
 
 moveRight : Tetrimino -> Tetrimino
-moveRight { kind, location, direction } =
-    { kind = kind
-    , location = Location.add location (loc 0 1)
-    , direction = direction
-    }
+moveRight tetrimino =
+    { tetrimino | location = Location.add tetrimino.location (loc 0 1) }
 
 
 moveDown : Tetrimino -> Tetrimino
-moveDown { kind, location, direction } =
-    { kind = kind
-    , location = Location.add location (loc 1 0)
-    , direction = direction
-    }
+moveDown tetrimino =
+    { tetrimino | location = Location.add tetrimino.location (loc 1 0) }
 
 
 moveLeft : Tetrimino -> Tetrimino
-moveLeft { kind, location, direction } =
-    { kind = kind
-    , location = Location.add location (loc 0 -1)
-    , direction = direction
-    }
+moveLeft tetrimino =
+    { tetrimino | location = Location.add tetrimino.location (loc 0 -1) }
 
 
 toLocationColorPairList : Tetrimino -> List ( Location, Color )

@@ -27,7 +27,9 @@ update msg model =
                                         updatedTetrimino
                                         model.field
                                 then
-                                    ( { model | tetrimino = Just updatedTetrimino }
+                                    ( { model
+                                        | tetrimino = Just updatedTetrimino
+                                      }
                                     , Cmd.none
                                     )
                                 else

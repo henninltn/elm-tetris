@@ -23,7 +23,7 @@ view model =
             [ model.field
                 |> fieldSvg
             , model.tetrimino
-                |> tetriminoSvg
+                |> maybeTetriminoSvg
             , model.isGameOver
                 |> gameOverSvg
             ]
@@ -57,17 +57,17 @@ blockSvg location color =
         []
 
 
-tetriminoSvg : Maybe Tetrimino -> Svg Msg
-tetriminoSvg maybeTetrimino =
+maybeTetriminoSvg : Maybe Tetrimino -> Svg Msg
+maybeTetriminoSvg maybeTetrimino =
     maybeTetrimino
         |> Maybe.map
-            (\t -> justTetriminoSvg t)
+            (\t -> tetriminoSvg t)
         |> Maybe.withDefault
             (g [] [])
 
 
-justTetriminoSvg : Tetrimino -> Svg Msg
-justTetriminoSvg tetrimino =
+tetriminoSvg : Tetrimino -> Svg Msg
+tetriminoSvg tetrimino =
     let
         posX =
             tetrimino.location |> getX
