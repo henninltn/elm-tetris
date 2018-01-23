@@ -1,5 +1,6 @@
 module Update.Field exposing (update)
 
+import Char
 import Matrix exposing (loc)
 import Model.Direction exposing (Direction(..))
 import Model.Field as Field exposing (Msg(..), Model)
@@ -80,19 +81,63 @@ update msg model =
                 )
 
             AddTetrimino kind ->
-                ( Debug.log "AddTetrimino: "
-                    { model
-                        | nextTetriminoQueue =
-                            model.nextTetriminoQueue
-                                |> List.append
-                                    [ { kind = kind
-                                      , location = loc 1 4
-                                      , direction = Up
-                                      }
-                                    ]
-                    }
+                ( { model
+                    | nextTetriminoQueue =
+                        model.nextTetriminoQueue
+                            |> List.append
+                                [ { kind = kind
+                                  , location = loc 1 4
+                                  , direction = Up
+                                  }
+                                ]
+                  }
                 , Cmd.none
                 )
+
+            KeyPresses keyCode ->
+                case model.tetrimino of
+                    Just tetrimino ->
+                        let
+                            updatedTetrimino =
+                                if
+                                    keyCode
+                                        == 13
+                                        || keyCode
+                                        == (Char.toCode 'h')
+                                        || keyCode
+                                        == (Char.toCode 'a')
+                                then
+                                    tetrimino |> Tetrimino.moveLeft
+                                else if
+                                    keyCode
+                                        == 17
+                                        || keyCode
+                                        == (Char.toCode 'l')
+                                        || keyCode
+                                        == (Char.toCode 'd')
+                                then
+                                    tetrimino |> Tetrimino.moveRight
+                                else if
+                                    keyCode
+                                        == 18
+                                        || keyCode
+                                        == (Char.toCode 'j')
+                                        || keyCode
+                                        == (Char.toCode 's')
+                                then
+                                    tetrimino |> Tetrimino.moveDown
+                                else
+                                    tetrimino
+                        in
+                            if Field.isValidLocation updatedTetrimino model.field then
+                                ( { model | tetrimino = Just updatedTetrimino }
+                                , Cmd.none
+                                )
+                            else
+                                ( model, Cmd.none )
+
+                    Nothing ->
+                        ( model, Cmd.none )
 
 
 generateKind : Generator Kind

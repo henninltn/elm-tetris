@@ -1,9 +1,13 @@
 module Subscriptions.Field exposing (subscriptions)
 
+import Keyboard
 import Model.Field exposing (Msg(..), Model)
 import Time exposing (Time)
 
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Time.every (500 * Time.millisecond) FreeFall
+    Sub.batch
+        [ Time.every (500 * Time.millisecond) FreeFall
+        , Keyboard.presses KeyPresses
+        ]

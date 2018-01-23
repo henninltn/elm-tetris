@@ -8,6 +8,7 @@ module Model.Field
         , fixTetrimino
         )
 
+import Keyboard exposing (KeyCode)
 import Matrix exposing (Location, Matrix)
 import Model.Color exposing (Color(..))
 import Model.Tetrimino as Tetrimino exposing (Tetrimino, Kind)
@@ -18,6 +19,7 @@ type Msg
     = FreeFall Time
     | Init (List Kind)
     | AddTetrimino Kind
+    | KeyPresses KeyCode
 
 
 type alias Model =
