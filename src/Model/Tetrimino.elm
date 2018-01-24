@@ -6,6 +6,8 @@ module Model.Tetrimino
         , moveRight
         , moveDown
         , moveLeft
+        , rotateRight
+        , rotateLeft
         , toPositionColorPairList
         )
 
@@ -69,6 +71,54 @@ moveDown tetrimino =
 moveLeft : Tetrimino -> Tetrimino
 moveLeft tetrimino =
     { tetrimino | position = Position.left 1 tetrimino.position }
+
+
+rotateRight : Tetrimino -> Tetrimino
+rotateRight ({ kind, position, direction } as tetrimino) =
+    { tetrimino
+        | direction = Direction.rotateRight tetrimino.direction
+    }
+        |> case kind of
+            I ->
+                case direction of
+                    Up ->
+                        moveDown
+
+                    Right ->
+                        moveLeft
+
+                    Down ->
+                        moveUp
+
+                    Left ->
+                        moveRight
+
+            _ ->
+                identity
+
+
+rotateLeft : Tetrimino -> Tetrimino
+rotateLeft ({ kind, position, direction } as tetrimino) =
+    { tetrimino
+        | direction = Direction.rotateLeft tetrimino.direction
+    }
+        |> case kind of
+            I ->
+                case direction of
+                    Up ->
+                        moveLeft
+
+                    Right ->
+                        moveUp
+
+                    Down ->
+                        moveRight
+
+                    Left ->
+                        moveDown
+
+            _ ->
+                identity
 
 
 toPositionColorPairList : Tetrimino -> List ( Position, Color )

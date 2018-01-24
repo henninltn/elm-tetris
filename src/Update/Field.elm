@@ -124,6 +124,20 @@ update msg model =
                                         == 's'
                                 then
                                     tetrimino |> Tetrimino.moveDown
+                                else if
+                                    key
+                                        == 'r'
+                                        || key
+                                        == 'i'
+                                then
+                                    tetrimino |> Tetrimino.rotateRight
+                                else if
+                                    key
+                                        == 'e'
+                                        || key
+                                        == 'u'
+                                then
+                                    tetrimino |> Tetrimino.rotateLeft
                                 else
                                     tetrimino
                         in
