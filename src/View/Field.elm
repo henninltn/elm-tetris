@@ -1,10 +1,12 @@
 module View.Field exposing (view)
 
+import Array.Hamt as Array
 import Html exposing (..)
 import Html.Attributes as HA
-import Matrix exposing (Matrix, Location)
+import Matrix exposing (Matrix)
 import Model.Color exposing (Color)
 import Model.Field as Field exposing (Msg(..), Model, Field)
+import Model.Position exposing (Position)
 import Model.Tetrimino as Tetrimino exposing (Tetrimino)
 import Svg exposing (..)
 import Svg.Attributes as SA
@@ -35,21 +37,11 @@ blockSize =
     20
 
 
-getX : Location -> Int
-getX location =
-    location |> Matrix.col |> ((*) blockSize)
-
-
-getY : Location -> Int
-getY location =
-    location |> Matrix.row |> ((*) blockSize)
-
-
-blockSvg : Location -> Color -> Svg Msg
-blockSvg location color =
+blockSvg : Position -> Color -> Svg Msg
+blockSvg position color =
     rect
-        [ SA.x (location |> getX |> toString)
-        , SA.y (location |> getY |> toString)
+        [ SA.x (position.x * blockSize |> toString)
+        , SA.y (position.y * blockSize |> toString)
         , SA.width (blockSize |> toString)
         , SA.height (blockSize |> toString)
         , SA.fill (color |> toString)
@@ -70,22 +62,22 @@ tetriminoSvg : Tetrimino -> Svg Msg
 tetriminoSvg tetrimino =
     let
         posX =
-            tetrimino.location |> getX
+            tetrimino.position.x * blockSize
 
         posY =
-            tetrimino.location |> getY
+            tetrimino.position.y * blockSize
     in
         g
             [ SA.x (posX |> toString)
             , SA.y (posY |> toString)
             ]
             (tetrimino
-                |> Tetrimino.toLocationColorPairList
+                |> Tetrimino.toPositionColorPairList
                 |> List.map
-                    (\( l, c ) ->
+                    (\( p, c ) ->
                         rect
-                            [ SA.x (l |> getX |> toString)
-                            , SA.y (l |> getY |> toString)
+                            [ SA.x (p.x * blockSize |> toString)
+                            , SA.y (p.y * blockSize |> toString)
                             , SA.width (blockSize |> toString)
                             , SA.height (blockSize |> toString)
                             , SA.fill (c |> toString)
@@ -99,9 +91,10 @@ fieldSvg : Field -> Svg Msg
 fieldSvg field =
     g []
         (field
-            |> Matrix.mapWithLocation
-                (\l c -> blockSvg l c)
-            |> Matrix.flatten
+            |> Matrix.toIndexedArray
+            |> Array.toList
+            |> List.map
+                (\( ( x, y ), c ) -> blockSvg { x = x, y = y } c)
         )
 
 

@@ -4,12 +4,12 @@ module Model.Field
         , Model
         , Field
         , init
-        , isValidLocation
+        , isValidPosition
         , fixTetrimino
         )
 
 import Keyboard exposing (KeyCode)
-import Matrix exposing (Location, Matrix)
+import Matrix exposing (Matrix)
 import Model.Color exposing (Color(..))
 import Model.Tetrimino as Tetrimino exposing (Tetrimino, Kind)
 import Time exposing (Time)
@@ -32,7 +32,7 @@ type alias Model =
 
 init : Model
 init =
-    { field = Matrix.matrix 21 10 (\_ -> Invisible)
+    { field = Matrix.repeat 10 21 Invisible
     , tetrimino = Nothing
     , nextTetriminoQueue = []
     , isGameOver = False
@@ -43,13 +43,13 @@ type alias Field =
     Matrix Color
 
 
-isValidLocation : Tetrimino -> Field -> Bool
-isValidLocation tetrimino field =
+isValidPosition : Tetrimino -> Field -> Bool
+isValidPosition tetrimino field =
     tetrimino
-        |> Tetrimino.toLocationColorPairList
+        |> Tetrimino.toPositionColorPairList
         |> List.all
-            (\( l, c ) ->
-                case (Matrix.get l field) of
+            (\( p, c ) ->
+                case (Matrix.get p.x p.y field) of
                     Just color ->
                         case color of
                             Invisible ->
@@ -65,12 +65,12 @@ isValidLocation tetrimino field =
 
 fixTetrimino : Tetrimino -> Field -> Maybe Field
 fixTetrimino tetrimino field =
-    if isValidLocation tetrimino field then
+    if isValidPosition tetrimino field then
         Just
             (tetrimino
-                |> Tetrimino.toLocationColorPairList
+                |> Tetrimino.toPositionColorPairList
                 |> List.foldr
-                    (\( l, c ) f -> Matrix.set l c f)
+                    (\( p, c ) f -> Matrix.set p.x p.y c f)
                     field
             )
     else

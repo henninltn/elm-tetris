@@ -6,18 +6,17 @@ module Model.Tetrimino
         , moveRight
         , moveDown
         , moveLeft
-        , toLocationColorPairList
+        , toPositionColorPairList
         )
 
-import Matrix exposing (Location, loc)
 import Model.Color exposing (Color(..))
-import Model.Direction exposing (Direction(..))
-import Model.Location as Location
+import Model.Direction as Direction exposing (Direction(..))
+import Model.Position as Position exposing (Position)
 
 
 type alias Tetrimino =
     { kind : Kind
-    , location : Location
+    , position : Position
     , direction : Direction
     }
 
@@ -52,142 +51,147 @@ intToKind i =
         Nothing
 
 
+moveUp : Tetrimino -> Tetrimino
+moveUp tetrimino =
+    { tetrimino | position = Position.up 1 tetrimino.position }
+
+
 moveRight : Tetrimino -> Tetrimino
 moveRight tetrimino =
-    { tetrimino | location = Location.add tetrimino.location (loc 0 1) }
+    { tetrimino | position = Position.right 1 tetrimino.position }
 
 
 moveDown : Tetrimino -> Tetrimino
 moveDown tetrimino =
-    { tetrimino | location = Location.add tetrimino.location (loc 1 0) }
+    { tetrimino | position = Position.down 1 tetrimino.position }
 
 
 moveLeft : Tetrimino -> Tetrimino
 moveLeft tetrimino =
-    { tetrimino | location = Location.add tetrimino.location (loc 0 -1) }
+    { tetrimino | position = Position.left 1 tetrimino.position }
 
 
-toLocationColorPairList : Tetrimino -> List ( Location, Color )
-toLocationColorPairList { kind, location, direction } =
-    List.map (\( l, c ) -> ( Location.add l location, c )) <|
+toPositionColorPairList : Tetrimino -> List ( Position, Color )
+toPositionColorPairList { kind, position, direction } =
+    List.map (\( p, c ) -> ( Position.add p position, c )) <|
         List.map (setRotate kind direction) <|
-            initLocationList kind
+            initPositionList kind
 
 
-setRotate : Kind -> Direction -> ( Location, Color ) -> ( Location, Color )
-setRotate kind direction locColorList =
+setRotate : Kind -> Direction -> ( Position, Color ) -> ( Position, Color )
+setRotate kind direction posColorList =
     case kind of
         O ->
-            locColorList
+            posColorList
 
         _ ->
             case direction of
                 Up ->
-                    locColorList
+                    posColorList
 
                 Right ->
-                    (\( l, c ) -> ( Location.rotateRight l, c )) <|
-                        locColorList
+                    (\( l, c ) -> ( Position.rotateRight l, c )) <|
+                        posColorList
 
                 Down ->
-                    (\( l, c ) -> ( Location.reverse l, c )) <|
-                        locColorList
+                    (\( l, c ) -> ( Position.reverse l, c )) <|
+                        posColorList
 
                 Left ->
-                    (\( l, c ) -> ( Location.rotateLeft l, c )) <|
-                        locColorList
+                    (\( l, c ) -> ( Position.rotateLeft l, c )) <|
+                        posColorList
 
 
-initLocationList : Kind -> List ( Location, Color )
-initLocationList kind =
+initPositionList : Kind -> List ( Position, Color )
+initPositionList kind =
     case kind of
         I ->
-            List.map (\location -> ( location, Lightblue )) <|
+            List.map (\position -> ( position, Lightblue )) <|
                 i
 
         O ->
-            List.map (\location -> ( location, Yellow )) <|
+            List.map (\position -> ( position, Yellow )) <|
                 o
 
         S ->
-            List.map (\location -> ( location, Yellowgreen )) <|
+            List.map (\position -> ( position, Yellowgreen )) <|
                 s
 
         Z ->
-            List.map (\location -> ( location, Red )) <|
+            List.map (\position -> ( position, Red )) <|
                 z
 
         J ->
-            List.map (\location -> ( location, Blue )) <|
+            List.map (\position -> ( position, Blue )) <|
                 j
 
         L ->
-            List.map (\location -> ( location, Orange )) <|
+            List.map (\position -> ( position, Orange )) <|
                 l
 
         T ->
-            List.map (\location -> ( location, Purple )) <|
+            List.map (\position -> ( position, Purple )) <|
                 t
 
 
-i : List Location
+i : List Position
 i =
-    [ loc -1 2
-    , loc -1 1
-    , loc -1 0
-    , loc -1 -1
+    [ { x = 2, y = -1 }
+    , { x = 1, y = -1 }
+    , { x = 0, y = -1 }
+    , { x = -1, y = -1 }
     ]
 
 
-o : List Location
+o : List Position
 o =
-    [ loc -1 0
-    , loc -1 -1
-    , loc 0 0
-    , loc 0 -1
+    [ { x = 0, y = -1 }
+    , { x = -1, y = -1 }
+    , { x = 0, y = 0 }
+    , { x = -1, y = 0 }
     ]
 
 
-s : List Location
+s : List Position
 s =
-    [ loc -1 0
-    , loc -1 -1
-    , loc 0 1
-    , loc 0 0
+    [ { x = 0, y = -1 }
+    , { x = -1, y = -1 }
+    , { x = 1, y = 0 }
+    , { x = 0, y = 0 }
     ]
 
 
-z : List Location
+z : List Position
 z =
-    [ loc -1 1
-    , loc -1 0
-    , loc 0 0
-    , loc 0 -1
+    [ { x = 1, y = -1 }
+    , { x = 0, y = -1 }
+    , { x = 0, y = 0 }
+    , { x = -1, y = 0 }
     ]
 
 
-j : List Location
+j : List Position
 j =
-    [ loc -1 1
-    , loc 0 1
-    , loc 0 0
-    , loc 0 -1
+    [ { x = 1, y = -1 }
+    , { x = 1, y = 0 }
+    , { x = 0, y = 0 }
+    , { x = -1, y = 0 }
     ]
 
 
-l : List Location
+l : List Position
 l =
-    [ loc -1 -1
-    , loc 0 1
-    , loc 0 0
-    , loc 0 -1
+    [ { x = -1, y = -1 }
+    , { x = 1, y = 0 }
+    , { x = 0, y = 0 }
+    , { x = -1, y = 0 }
     ]
 
 
-t : List Location
+t : List Position
 t =
-    [ loc -1 0
-    , loc 0 1
-    , loc 0 0
-    , loc 0 -1
+    [ { x = 0, y = -1 }
+    , { x = 1, y = 0 }
+    , { x = 0, y = 0 }
+    , { x = -1, y = 0 }
     ]

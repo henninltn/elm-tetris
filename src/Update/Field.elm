@@ -1,7 +1,6 @@
 module Update.Field exposing (update)
 
 import Char
-import Matrix exposing (loc)
 import Model.Direction exposing (Direction(..))
 import Model.Field as Field exposing (Msg(..), Model)
 import Model.Tetrimino as Tetrimino exposing (Tetrimino, Kind(..))
@@ -17,13 +16,13 @@ update msg model =
             FreeFall _ ->
                 case model.tetrimino of
                     Just tetrimino ->
-                        if Field.isValidLocation tetrimino model.field then
+                        if Field.isValidPosition tetrimino model.field then
                             let
                                 updatedTetrimino =
                                     Tetrimino.moveDown tetrimino
                             in
                                 if
-                                    Field.isValidLocation
+                                    Field.isValidPosition
                                         updatedTetrimino
                                         model.field
                                 then
@@ -64,7 +63,7 @@ update msg model =
                             |> Maybe.map
                                 (\kind ->
                                     { kind = kind
-                                    , location = loc 1 4
+                                    , position = { x = 4, y = 1 }
                                     , direction = Up
                                     }
                                 )
@@ -74,7 +73,7 @@ update msg model =
                             |> List.map
                                 (\kind ->
                                     { kind = kind
-                                    , location = loc 1 4
+                                    , position = { x = 4, y = 1 }
                                     , direction = Up
                                     }
                                 )
@@ -88,7 +87,7 @@ update msg model =
                         model.nextTetriminoQueue
                             |> List.append
                                 [ { kind = kind
-                                  , location = loc 1 4
+                                  , position = { x = 4, y = 1 }
                                   , direction = Up
                                   }
                                 ]
@@ -100,38 +99,35 @@ update msg model =
                 case model.tetrimino of
                     Just tetrimino ->
                         let
+                            key =
+                                Char.fromCode keyCode
+
                             updatedTetrimino =
                                 if
-                                    keyCode
-                                        == 13
-                                        || keyCode
-                                        == (Char.toCode 'h')
-                                        || keyCode
-                                        == (Char.toCode 'a')
+                                    key
+                                        == 'h'
+                                        || key
+                                        == 'a'
                                 then
                                     tetrimino |> Tetrimino.moveLeft
                                 else if
-                                    keyCode
-                                        == 17
-                                        || keyCode
-                                        == (Char.toCode 'l')
-                                        || keyCode
-                                        == (Char.toCode 'd')
+                                    key
+                                        == 'l'
+                                        || key
+                                        == 'd'
                                 then
                                     tetrimino |> Tetrimino.moveRight
                                 else if
-                                    keyCode
-                                        == 18
-                                        || keyCode
-                                        == (Char.toCode 'j')
-                                        || keyCode
-                                        == (Char.toCode 's')
+                                    key
+                                        == 'j'
+                                        || key
+                                        == 's'
                                 then
                                     tetrimino |> Tetrimino.moveDown
                                 else
                                     tetrimino
                         in
-                            if Field.isValidLocation updatedTetrimino model.field then
+                            if Field.isValidPosition updatedTetrimino model.field then
                                 ( { model | tetrimino = Just updatedTetrimino }
                                 , Cmd.none
                                 )
