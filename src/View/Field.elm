@@ -72,12 +72,12 @@ tetriminoSvg tetrimino =
             , SA.y (posY |> toString)
             ]
             (tetrimino
-                |> Tetrimino.toPositionColorPairList
+                |> Tetrimino.toList
                 |> List.map
-                    (\( p, c ) ->
+                    (\( x, y, c ) ->
                         rect
-                            [ SA.x (p.x * blockSize |> toString)
-                            , SA.y (p.y * blockSize |> toString)
+                            [ SA.x (x * blockSize |> toString)
+                            , SA.y (y * blockSize |> toString)
                             , SA.width (blockSize |> toString)
                             , SA.height (blockSize |> toString)
                             , SA.fill (c |> toString)

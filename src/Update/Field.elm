@@ -3,7 +3,8 @@ module Update.Field exposing (update)
 import Char
 import Model.Direction exposing (Direction(..))
 import Model.Field as Field exposing (Msg(..), Model)
-import Model.Tetrimino as Tetrimino exposing (Tetrimino, Kind(..))
+import Model.Tetrimino as Tetrimino exposing (Tetrimino)
+import Model.Kind as Kind exposing (Kind(..))
 import Random exposing (Generator)
 
 
@@ -158,8 +159,7 @@ generateKind =
         |> Random.map
             (\i ->
                 i
-                    |> Tetrimino.intToKind
-                    |> Maybe.withDefault I
+                    |> Kind.fromInt
             )
 
 
@@ -169,5 +169,5 @@ generateKindList =
         |> Random.map
             (\list ->
                 list
-                    |> List.map (\i -> i |> Tetrimino.intToKind |> Maybe.withDefault I)
+                    |> List.map (\i -> i |> Kind.fromInt)
             )

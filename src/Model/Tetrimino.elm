@@ -1,18 +1,17 @@
 module Model.Tetrimino
     exposing
         ( Tetrimino
-        , Kind(..)
-        , intToKind
         , moveRight
         , moveDown
         , moveLeft
         , rotateRight
         , rotateLeft
-        , toPositionColorPairList
+        , toList
         )
 
 import Model.Color exposing (Color(..))
 import Model.Direction as Direction exposing (Direction(..))
+import Model.Kind as Kind exposing (Kind(..))
 import Model.Position as Position exposing (Position)
 
 
@@ -23,34 +22,9 @@ type alias Tetrimino =
     }
 
 
-type Kind
-    = I
-    | O
-    | S
-    | Z
-    | J
-    | L
-    | T
-
-
-intToKind : Int -> Maybe Kind
-intToKind i =
-    if i == 0 then
-        Just I
-    else if i == 1 then
-        Just O
-    else if i == 2 then
-        Just S
-    else if i == 3 then
-        Just Z
-    else if i == 4 then
-        Just J
-    else if i == 5 then
-        Just L
-    else if i == 6 then
-        Just T
-    else
-        Nothing
+moveTo : Int -> Int -> Tetrimino -> Tetrimino
+moveTo x y tetrimino =
+    { tetrimino | position = { x = x, y = y } }
 
 
 moveUp : Tetrimino -> Tetrimino
@@ -121,67 +95,65 @@ rotateLeft ({ kind, position, direction } as tetrimino) =
                 identity
 
 
-toPositionColorPairList : Tetrimino -> List ( Position, Color )
-toPositionColorPairList { kind, position, direction } =
-    List.map (\( p, c ) -> ( Position.add p position, c )) <|
-        List.map (setRotate kind direction) <|
-            initPositionList kind
+toList : Tetrimino -> List ( Int, Int, Color )
+toList { kind, position, direction } =
+    let
+        color =
+            Kind.toColor kind
+    in
+        kind
+            |> initialPositionList
+            |> (setRotate kind direction)
+            |> List.map (\p -> ( p.x + position.x, p.y + position.y, color ))
 
 
-setRotate : Kind -> Direction -> ( Position, Color ) -> ( Position, Color )
-setRotate kind direction posColorList =
-    case kind of
-        O ->
-            posColorList
+setRotate : Kind -> Direction -> List Position -> List Position
+setRotate kind direction positionList =
+    positionList
+        |> List.map
+            (case kind of
+                O ->
+                    identity
 
-        _ ->
-            case direction of
-                Up ->
-                    posColorList
+                _ ->
+                    case direction of
+                        Up ->
+                            identity
 
-                Right ->
-                    (\( l, c ) -> ( Position.rotateRight l, c )) <|
-                        posColorList
+                        Right ->
+                            Position.rotateRight
 
-                Down ->
-                    (\( l, c ) -> ( Position.reverse l, c )) <|
-                        posColorList
+                        Down ->
+                            Position.reverse
 
-                Left ->
-                    (\( l, c ) -> ( Position.rotateLeft l, c )) <|
-                        posColorList
+                        Left ->
+                            Position.rotateLeft
+            )
 
 
-initPositionList : Kind -> List ( Position, Color )
-initPositionList kind =
+initialPositionList : Kind -> List Position
+initialPositionList kind =
     case kind of
         I ->
-            List.map (\position -> ( position, Lightblue )) <|
-                i
+            i
 
         O ->
-            List.map (\position -> ( position, Yellow )) <|
-                o
+            o
 
         S ->
-            List.map (\position -> ( position, Yellowgreen )) <|
-                s
+            s
 
         Z ->
-            List.map (\position -> ( position, Red )) <|
-                z
+            z
 
         J ->
-            List.map (\position -> ( position, Blue )) <|
-                j
+            j
 
         L ->
-            List.map (\position -> ( position, Orange )) <|
-                l
+            l
 
         T ->
-            List.map (\position -> ( position, Purple )) <|
-                t
+            t
 
 
 i : List Position

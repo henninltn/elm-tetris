@@ -11,7 +11,8 @@ module Model.Field
 import Keyboard exposing (KeyCode)
 import Matrix exposing (Matrix)
 import Model.Color exposing (Color(..))
-import Model.Tetrimino as Tetrimino exposing (Tetrimino, Kind)
+import Model.Kind exposing (Kind(..))
+import Model.Tetrimino as Tetrimino exposing (Tetrimino)
 import Time exposing (Time)
 
 
@@ -46,10 +47,10 @@ type alias Field =
 isValidPosition : Tetrimino -> Field -> Bool
 isValidPosition tetrimino field =
     tetrimino
-        |> Tetrimino.toPositionColorPairList
+        |> Tetrimino.toList
         |> List.all
-            (\( p, c ) ->
-                case (Matrix.get p.x p.y field) of
+            (\( x, y, c ) ->
+                case (Matrix.get x y field) of
                     Just color ->
                         case color of
                             Invisible ->
@@ -68,9 +69,9 @@ fixTetrimino tetrimino field =
     if isValidPosition tetrimino field then
         Just
             (tetrimino
-                |> Tetrimino.toPositionColorPairList
+                |> Tetrimino.toList
                 |> List.foldr
-                    (\( p, c ) f -> Matrix.set p.x p.y c f)
+                    (\( x, y, c ) f -> Matrix.set x y c f)
                     field
             )
     else
