@@ -1,6 +1,8 @@
 module Model.Tetrimino
     exposing
         ( Tetrimino
+        , tetrimino
+        , moveTo
         , moveRight
         , moveDown
         , moveLeft
@@ -19,6 +21,14 @@ type alias Tetrimino =
     { kind : Kind
     , position : Position
     , direction : Direction
+    }
+
+
+tetrimino : Kind -> Tetrimino
+tetrimino kind =
+    { kind = kind
+    , position = { x = 0, y = 0 }
+    , direction = Up
     }
 
 
@@ -95,7 +105,7 @@ rotateLeft ({ kind, position, direction } as tetrimino) =
                 identity
 
 
-toList : Tetrimino -> List ( Int, Int, Color )
+toList : Tetrimino -> List ( ( Int, Int ), Color )
 toList { kind, position, direction } =
     let
         color =
@@ -104,7 +114,7 @@ toList { kind, position, direction } =
         kind
             |> initialPositionList
             |> (setRotate kind direction)
-            |> List.map (\p -> ( p.x + position.x, p.y + position.y, color ))
+            |> List.map (\p -> ( ( p.x + position.x, p.y + position.y ), color ))
 
 
 setRotate : Kind -> Direction -> List Position -> List Position

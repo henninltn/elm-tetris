@@ -1,13 +1,9 @@
 module View.Field exposing (view)
 
-import Array.Hamt as Array
 import Html exposing (..)
 import Html.Attributes as HA
-import Matrix exposing (Matrix)
 import Model.Color exposing (Color)
 import Model.Field as Field exposing (Msg(..), Model, Field)
-import Model.Position exposing (Position)
-import Model.Tetrimino as Tetrimino exposing (Tetrimino)
 import Svg exposing (..)
 import Svg.Attributes as SA
 
@@ -24,12 +20,20 @@ view model =
             ]
             [ model.field
                 |> fieldSvg
-            , model.tetrimino
-                |> maybeTetriminoSvg
             , model.isGameOver
                 |> gameOverSvg
             ]
         ]
+
+
+fieldSvg : Field -> Svg Msg
+fieldSvg field =
+    g []
+        (field
+            |> Field.toList
+            |> List.map
+                blockSvg
+        )
 
 
 blockSize : Int
@@ -37,65 +41,16 @@ blockSize =
     20
 
 
-blockSvg : Position -> Color -> Svg Msg
-blockSvg position color =
+blockSvg : ( ( Int, Int ), Color ) -> Svg Msg
+blockSvg ( ( x, y ), color ) =
     rect
-        [ SA.x (position.x * blockSize |> toString)
-        , SA.y (position.y * blockSize |> toString)
+        [ SA.x (x * blockSize |> toString)
+        , SA.y (y * blockSize |> toString)
         , SA.width (blockSize |> toString)
         , SA.height (blockSize |> toString)
         , SA.fill (color |> toString)
         ]
         []
-
-
-maybeTetriminoSvg : Maybe Tetrimino -> Svg Msg
-maybeTetriminoSvg maybeTetrimino =
-    maybeTetrimino
-        |> Maybe.map
-            (\t -> tetriminoSvg t)
-        |> Maybe.withDefault
-            (g [] [])
-
-
-tetriminoSvg : Tetrimino -> Svg Msg
-tetriminoSvg tetrimino =
-    let
-        posX =
-            tetrimino.position.x * blockSize
-
-        posY =
-            tetrimino.position.y * blockSize
-    in
-        g
-            [ SA.x (posX |> toString)
-            , SA.y (posY |> toString)
-            ]
-            (tetrimino
-                |> Tetrimino.toList
-                |> List.map
-                    (\( x, y, c ) ->
-                        rect
-                            [ SA.x (x * blockSize |> toString)
-                            , SA.y (y * blockSize |> toString)
-                            , SA.width (blockSize |> toString)
-                            , SA.height (blockSize |> toString)
-                            , SA.fill (c |> toString)
-                            ]
-                            []
-                    )
-            )
-
-
-fieldSvg : Field -> Svg Msg
-fieldSvg field =
-    g []
-        (field
-            |> Matrix.toIndexedArray
-            |> Array.toList
-            |> List.map
-                (\( ( x, y ), c ) -> blockSvg { x = x, y = y } c)
-        )
 
 
 gameOverSvg : Bool -> Svg Msg

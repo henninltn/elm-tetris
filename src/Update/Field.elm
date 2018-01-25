@@ -1,11 +1,9 @@
 module Update.Field exposing (update)
 
 import Char
-import Model.Direction exposing (Direction(..))
-import Model.Field as Field exposing (Msg(..), Model)
-import Model.Tetrimino as Tetrimino exposing (Tetrimino)
-import Model.Kind as Kind exposing (Kind(..))
-import Random exposing (Generator)
+import Commands.Field as Commands
+import Model.Field as Field exposing (Msg(..), Model, Field)
+import Queue
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -14,160 +12,139 @@ update msg model =
         ( model, Cmd.none )
     else
         case msg of
+            Init ->
+                ( model
+                , Commands.newTetrimino
+                )
+
+            NewTetrimino kind ->
+                let
+                    ( nextTetrimino, updatedQueue ) =
+                        Queue.deq model.queue
+                in
+                    case nextTetrimino of
+                        Just tetrimino ->
+                            ( { model
+                                | field =
+                                    model.field
+                                        |> Field.setCurrent
+                                            tetrimino
+                                , queue =
+                                    updatedQueue
+                                        |> Queue.enq
+                                            (Field.initTetrimino kind)
+                              }
+                            , Cmd.none
+                            )
+
+                        Nothing ->
+                            ( model
+                            , Commands.fillQueue
+                            )
+
+            FillQueue ( kind, kindList ) ->
+                ( { model
+                    | queue =
+                        kind
+                            :: kindList
+                            |> List.foldr
+                                (\kind queue ->
+                                    queue
+                                        |> Queue.enq
+                                            (Field.initTetrimino kind)
+                                )
+                                Queue.empty
+                  }
+                , Commands.newTetrimino
+                )
+
             FreeFall _ ->
-                case model.tetrimino of
-                    Just tetrimino ->
-                        if Field.isValidPosition tetrimino model.field then
-                            let
-                                updatedTetrimino =
-                                    Tetrimino.moveDown tetrimino
-                            in
-                                if
-                                    Field.isValidPosition
-                                        updatedTetrimino
-                                        model.field
-                                then
-                                    ( { model
-                                        | tetrimino = Just updatedTetrimino
-                                      }
-                                    , Cmd.none
-                                    )
-                                else
-                                    ( { model
-                                        | tetrimino = List.head model.nextTetriminoQueue
-                                        , nextTetriminoQueue = List.drop 1 model.nextTetriminoQueue
-                                        , field =
-                                            model.field
-                                                |> Field.fixTetrimino tetrimino
-                                                |> Maybe.withDefault
-                                                    model.field
-                                      }
-                                    , Random.generate
-                                        AddTetrimino
-                                        generateKind
-                                    )
-                        else
-                            ( { model | isGameOver = True }, Cmd.none )
+                case Field.fixTetrimino model.field of
+                    Just fixedField ->
+                        case model.field.current of
+                            Just _ ->
+                                case Field.moveDown model.field of
+                                    Just movedField ->
+                                        ( { model
+                                            | field = movedField
+                                          }
+                                        , Cmd.none
+                                        )
+
+                                    Nothing ->
+                                        ( { model
+                                            | field = fixedField
+                                          }
+                                        , Commands.newTetrimino
+                                        )
+
+                            Nothing ->
+                                ( model, Cmd.none )
 
                     Nothing ->
-                        ( model
-                        , Random.generate
-                            Init
-                            generateKindList
-                        )
+                        ( { model | isGameOver = True }, Cmd.none )
 
-            Init kindList ->
-                ( { model
-                    | tetrimino =
-                        kindList
-                            |> List.head
-                            |> Maybe.map
-                                (\kind ->
-                                    { kind = kind
-                                    , position = { x = 4, y = 1 }
-                                    , direction = Up
-                                    }
-                                )
-                    , nextTetriminoQueue =
-                        kindList
-                            |> List.drop 1
-                            |> List.map
-                                (\kind ->
-                                    { kind = kind
-                                    , position = { x = 4, y = 1 }
-                                    , direction = Up
-                                    }
-                                )
-                  }
-                , Cmd.none
-                )
-
-            AddTetrimino kind ->
-                ( { model
-                    | nextTetriminoQueue =
-                        model.nextTetriminoQueue
-                            |> List.append
-                                [ { kind = kind
-                                  , position = { x = 4, y = 1 }
-                                  , direction = Up
-                                  }
-                                ]
-                  }
-                , Cmd.none
-                )
-
-            KeyPresses keyCode ->
-                case model.tetrimino of
-                    Just tetrimino ->
+            KeyDowns keyCode ->
+                case model.field.current of
+                    Just _ ->
                         let
                             key =
                                 Char.fromCode keyCode
 
-                            updatedTetrimino =
-                                if
-                                    key
-                                        == 'h'
-                                        || key
-                                        == 'a'
-                                then
-                                    tetrimino |> Tetrimino.moveLeft
-                                else if
-                                    key
-                                        == 'l'
-                                        || key
-                                        == 'd'
-                                then
-                                    tetrimino |> Tetrimino.moveRight
-                                else if
-                                    key
-                                        == 'j'
-                                        || key
-                                        == 's'
-                                then
-                                    tetrimino |> Tetrimino.moveDown
-                                else if
-                                    key
-                                        == 'r'
-                                        || key
-                                        == 'i'
-                                then
-                                    tetrimino |> Tetrimino.rotateRight
-                                else if
-                                    key
-                                        == 'e'
-                                        || key
-                                        == 'u'
-                                then
-                                    tetrimino |> Tetrimino.rotateLeft
-                                else
-                                    tetrimino
+                            updatedField =
+                                model.field
+                                    |> if
+                                        key
+                                            == 'L'
+                                            || key
+                                            == 'D'
+                                            || keyCode
+                                            == 39
+                                       then
+                                        Field.moveRight
+                                       else if
+                                        key
+                                            == 'J'
+                                            || key
+                                            == 'S'
+                                            || keyCode
+                                            == 40
+                                       then
+                                        Field.moveDown
+                                       else if
+                                        key
+                                            == 'H'
+                                            || key
+                                            == 'A'
+                                            || keyCode
+                                            == 37
+                                       then
+                                        Field.moveLeft
+                                       else if
+                                        key
+                                            == 'R'
+                                            || key
+                                            == 'I'
+                                       then
+                                        Field.rotateRight
+                                       else if
+                                        key
+                                            == 'E'
+                                            || key
+                                            == 'U'
+                                       then
+                                        Field.rotateLeft
+                                       else
+                                        Just
                         in
-                            if Field.isValidPosition updatedTetrimino model.field then
-                                ( { model | tetrimino = Just updatedTetrimino }
-                                , Cmd.none
-                                )
-                            else
-                                ( model, Cmd.none )
+                            case updatedField of
+                                Just field ->
+                                    ( { model | field = field }
+                                    , Cmd.none
+                                    )
+
+                                Nothing ->
+                                    ( model, Cmd.none )
 
                     Nothing ->
                         ( model, Cmd.none )
-
-
-generateKind : Generator Kind
-generateKind =
-    (Random.int 0 6)
-        |> Random.map
-            (\i ->
-                i
-                    |> Kind.fromInt
-            )
-
-
-generateKindList : Generator (List Kind)
-generateKindList =
-    (Random.list 6 (Random.int 0 6))
-        |> Random.map
-            (\list ->
-                list
-                    |> List.map (\i -> i |> Kind.fromInt)
-            )

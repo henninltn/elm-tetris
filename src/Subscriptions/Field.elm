@@ -9,5 +9,5 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ Time.every (500 * Time.millisecond) FreeFall
-        , Keyboard.presses KeyPresses
+        , Keyboard.downs KeyDowns
         ]
