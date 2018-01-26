@@ -5,7 +5,6 @@ module Model.Field
         , init
         , Field
         , setCurrent
-        , isValid
         , fixTetrimino
         , toList
         , moveRight
@@ -17,7 +16,7 @@ module Model.Field
         )
 
 import Array.Hamt as Array
-import Keyboard exposing (KeyCode)
+import Keyboard.Extra exposing (Key)
 import Matrix exposing (Matrix)
 import Model.Color exposing (Color(..))
 import Model.Kind exposing (Kind(..))
@@ -31,7 +30,7 @@ type Msg
     | FillQueue ( Kind, List Kind )
     | NewTetrimino Kind
     | FreeFall Time
-    | KeyDowns KeyCode
+    | KeyDowns Key
 
 
 type alias Model =

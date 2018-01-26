@@ -1,6 +1,6 @@
 module Subscriptions.Field exposing (subscriptions)
 
-import Keyboard
+import Keyboard.Extra as Keyboard
 import Model.Field exposing (Msg(..), Model)
 import Time exposing (Time)
 

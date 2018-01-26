@@ -1,7 +1,7 @@
 module Update.Field exposing (update)
 
-import Char
 import Commands.Field as Commands
+import Keyboard.Extra exposing (Key(..))
 import Model.Field as Field exposing (Msg(..), Model, Field)
 import Queue
 
@@ -84,54 +84,40 @@ update msg model =
                     Nothing ->
                         ( { model | isGameOver = True }, Cmd.none )
 
-            KeyDowns keyCode ->
+            KeyDowns key ->
                 case model.field.current of
                     Just _ ->
                         let
-                            key =
-                                Char.fromCode keyCode
-
                             updatedField =
                                 model.field
                                     |> if
-                                        key
-                                            == 'L'
-                                            || key
-                                            == 'D'
-                                            || keyCode
-                                            == 39
+                                        List.member
+                                            key
+                                            [ ArrowRight, CharL, CharD ]
                                        then
                                         Field.moveRight
                                        else if
-                                        key
-                                            == 'J'
-                                            || key
-                                            == 'S'
-                                            || keyCode
-                                            == 40
+                                        List.member
+                                            key
+                                            [ ArrowDown, CharJ, CharS ]
                                        then
                                         Field.moveDown
                                        else if
-                                        key
-                                            == 'H'
-                                            || key
-                                            == 'A'
-                                            || keyCode
-                                            == 37
+                                        List.member
+                                            key
+                                            [ ArrowLeft, CharH, CharA ]
                                        then
                                         Field.moveLeft
                                        else if
-                                        key
-                                            == 'R'
-                                            || key
-                                            == 'I'
+                                        List.member
+                                            key
+                                            [ CharR, CharI ]
                                        then
                                         Field.rotateRight
                                        else if
-                                        key
-                                            == 'E'
-                                            || key
-                                            == 'U'
+                                        List.member
+                                            key
+                                            [ CharE, CharU ]
                                        then
                                         Field.rotateLeft
                                        else
