@@ -30,12 +30,12 @@ add p1 p2 =
 
 rotateRight : Position -> Position
 rotateRight { x, y } =
-    { x = y, y = -x }
+    { x = -y, y = x }
 
 
 rotateLeft : Position -> Position
 rotateLeft { x, y } =
-    { x = -y, y = x }
+    { x = y, y = -x }
 
 
 up : Int -> Position -> Position
